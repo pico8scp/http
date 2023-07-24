@@ -1,0 +1,67 @@
+{
+	"debug": true,
+	"ssl_config": {
+		"is_open": false,
+		"key_path": "",
+		"pem_path": ""
+	},
+	"server_config": {
+		"is_client": true,
+		"is_server": false,
+		"ServerPool": [
+			{
+				"name": "奶子",
+				"host": "127.0.0.1",
+				"port": "9123",
+				"type": "websocket",
+				"random_seed": 0,
+				"random_seed_length": 2,
+				"random_seed_min": 20000,
+				"random_seed_max": 60000
+			}
+		]
+	},
+	"path_config": {
+		"main_path": "/mnt/d/code_project/gs-socks/socks_server_v2",
+		"file_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file",
+		"ssl_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file/ssl",
+		"log_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file/log",
+		"db_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file/db"
+	},
+	"api_config": {
+		"ip": "",
+		"port": ""
+	},
+	"tun_config": [
+		{
+			"src": "0.0.0.0:5678",
+			"dest": "103.190.179.80:2333",
+			"type": ""
+		}
+	],
+	"socks5_config": [
+		{
+			"host": "0.0.0.0",
+			"port": 1080
+		}
+	],
+	"http_config": [
+		{
+			"host": "0.0.0.0",
+			"port": 816,
+			"min_port": 10002,
+			"max_port": 10245,
+			"username": "112233",
+			"password": "332211",
+			"is_same_ip_access": true
+		}
+	],
+	"reverse_proxy_config": [
+		{
+			"local_host": "127.0.0.1",
+			"local_port": 80,
+			"service_host": "0.0.0.0",
+			"service_port": 8085
+		}
+	]
+}
