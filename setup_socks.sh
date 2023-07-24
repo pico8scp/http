@@ -21,13 +21,15 @@ while [ ! -d "http" ]; do
 done
 
 # 进入克隆下来的目录
-echo "进入克隆下来的目录..."
 cd http
 
-# 将可执行文件移动到指定目录
-echo "将可执行文件移动到指定目录..."
+# 将克隆文件移动到指定目录
+echo "将克隆文件移动到指定目录..."
 mkdir -p /root/socks
-mv gs-v3-linux-amd64 /root/socks/
+mv * /root/socks/
+
+# 切换到目标目录
+cd /root/socks
 
 # 配置服务端守护程序
 echo "配置服务端守护程序..."
