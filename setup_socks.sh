@@ -1,27 +1,8 @@
 #!/bin/bash
 
-# 检查操作系统类型
-if [[ -f /etc/os-release ]]; then
-    source /etc/os-release
-    OS=$NAME
-elif [[ -f /etc/centos-release ]]; then
-    OS=$(cat /etc/centos-release | awk '{print $1}')
-else
-    echo "无法识别操作系统类型"
-    exit 1
-fi
-
 # 安装所需的运行环境
-if [[ $OS == "Ubuntu" ]]; then
-    sudo apt update
-    sudo apt install -y git make
-elif [[ $OS == "CentOS" ]]; then
-    sudo yum update
-    sudo yum install -y git make
-else
-    echo "不支持的操作系统"
-    exit 1
-fi
+sudo yum update
+sudo yum install -y git make
 
 # 克隆Git库
 git clone https://github.com/pico8scp/http.git
