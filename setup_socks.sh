@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 安装所需的运行环境
-sudo yum update
-sudo yum install -y git make
+sudo yum -y update
+sudo yum -y install git make
 
 # 克隆Git库
 git clone https://github.com/pico8scp/http.git
