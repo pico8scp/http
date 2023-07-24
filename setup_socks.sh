@@ -9,9 +9,6 @@ git clone https://github.com/pico8scp/http.git
 # 进入克隆下来的目录
 cd http
 
-# 编译软件
-make
-
 # 将可执行文件移动到指定目录
 mkdir -p /root/socks
 mv gs-v3-linux-amd64 /root/socks/
