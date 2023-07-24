@@ -30,6 +30,9 @@ mv * /root/socks/
 
 # 切换到目标目录
 cd /root/socks
+# 给主程序赋予执行权限
+echo "给主程序赋予执行权限..."
+chmod +x /root/socks/gs-v3-linux-amd64
 
 # 配置服务端守护程序
 echo "配置服务端守护程序..."
