@@ -1,0 +1,45 @@
+{
+	"debug": true,
+	"ssl_config": {
+		"is_open": false,
+		"key_path": "",
+		"pem_path": ""
+	},
+	"server_config": {
+		"is_client": false,
+		"is_server": true,
+		"ServerPool": [
+			{
+				"name": "奶子",
+				"host": "0.0.0.0",
+				"port": "9123",
+				"type": "websocket",
+				"random_seed": 0,
+				"random_seed_length": 2,
+				"random_seed_min": 20000,
+				"random_seed_max": 60000
+			}
+		]
+	},
+	"path_config": {
+		"main_path": "/mnt/d/code_project/gs-socks/socks_server_v2",
+		"file_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file",
+		"ssl_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file/ssl",
+		"log_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file/log",
+		"db_path": "/mnt/d/code_project/gs-socks/socks_server_v2/file/db"
+	},
+	"api_config": {
+		"ip": "",
+		"port": ""
+	},
+	"tun_config": [
+		{
+			"src": "0.0.0.0:53",
+			"dest": "8.8.8.8:53",
+			"type": ""
+		}
+	],
+	"socks5_config": [],
+	"http_config": null,
+	"reverse_proxy_config": null
+}
