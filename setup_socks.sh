@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # 安装所需的运行环境
-sudo yum -y update
 sudo yum -y install git make
 
 # 克隆Git库
