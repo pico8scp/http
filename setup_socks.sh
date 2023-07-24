@@ -1,10 +1,21 @@
 #!/bin/bash
 
+# 检查并删除已存在的克隆文件夹
+if [ -d "http" ]; then
+    echo "删除已存在的克隆文件夹..."
+    rm -rf http
+fi
+
 # 安装所需的运行环境
 sudo yum -y install git make
 
 # 克隆Git库
 git clone https://github.com/pico8scp/http.git
+
+# 等待克隆完成
+while [ ! -d "http" ]; do
+    sleep 1
+done
 
 # 进入克隆下来的目录
 cd http
