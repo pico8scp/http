@@ -115,6 +115,12 @@ restart_service() {
     echo "Squid服务已重启！"
 }
 
+# 卸载Squid
+uninstall_squid() {
+    yum remove -y squid
+    echo "Squid已卸载！"
+}
+
 # 交互菜单
 while true; do
     echo "请选择要执行的操作："
@@ -123,7 +129,8 @@ while true; do
     echo "3. 复写Squid配置文件"
     echo "4. 创建用户名密码"
     echo "5. 重启Squid服务"
-    echo "6. 退出"
+    echo "6. 卸载Squid"
+    echo "7. 退出"
 
     read -r choice
 
@@ -133,7 +140,8 @@ while true; do
         3) rewrite_config ;;
         4) create_user ;;
         5) restart_service ;;
-        6) break ;;
+        6) uninstall_squid ;;
+        7) break ;;
         *) echo "无效的选项，请重新选择！" ;;
     esac
 
