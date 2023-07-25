@@ -2,39 +2,105 @@
 
 # 安装Squid
 install_squid() {
-    echo "开始安装Squid..."
-    yum update -y
     yum install -y squid
-    echo "Squid安装完成！"
+    yum install httpd-tools
+    echo "Squid已安装！"
 }
 
-# 配置Squid
-configure_squid() {
-    echo "开始配置Squid..."
-    # 备份默认配置文件
+# 备份Squid配置文件
+backup_config() {
     cp /etc/squid/squid.conf /etc/squid/squid.conf.bak
-
-    # 修改Squid配置文件
-    sed -i 's/#cache_log \/var\/log\/squid\/cache.log/cache_log \/var\/log\/squid\/access.log squid auth/g' /etc/squid/squid.conf
-    echo "auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd" >> /etc/squid/squid.conf
-    echo "auth_param basic children 5" >> /etc/squid/squid.conf
-    echo "auth_param basic realm Squid proxy-caching web server" >> /etc/squid/squid.conf
-    echo "auth_param basic credentialsttl 2 hours" >> /etc/squid/squid.conf
-    echo "auth_param basic casesensitive off" >> /etc/squid/squid.conf
-    echo "acl authenticated proxy_auth REQUIRED" >> /etc/squid/squid.conf
-    echo "http_access allow authenticated" >> /etc/squid/squid.conf
-
-    # 创建用户名和密码文件
-    create_password_file
-
-    # 设置Squid为自启动
-    systemctl enable squid
-
-    echo "Squid配置完成！"
+    echo "Squid配置文件已备份！"
 }
 
-# 创建用户名和密码文件
-create_password_file() {
+# 复写Squid配置文件
+rewrite_config() {
+    cat > /etc/squid/squid.conf << EOF
+#
+# Recommended minimum configuration:
+#
+
+# Example rule allowing access from your local networks.
+# Adapt to list your (internal) IP networks from where browsing
+# should be allowed
+acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+acl localnet src fc00::/7       # RFC 4193 local private network range
+acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines
+
+acl SSL_ports port 443
+acl Safe_ports port 80		# http
+acl Safe_ports port 21		# ftp
+acl Safe_ports port 443		# https
+acl Safe_ports port 70		# gopher
+acl Safe_ports port 210		# wais
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 280		# http-mgmt
+acl Safe_ports port 488		# gss-http
+acl Safe_ports port 591		# filemaker
+acl Safe_ports port 777		# multiling http
+acl CONNECT method CONNECT
+
+#
+# Recommended minimum Access Permission configuration:
+#
+# Deny requests to certain unsafe ports
+http_access deny !Safe_ports
+
+# Deny CONNECT to other than secure SSL ports
+#http_access deny CONNECT !SSL_ports
+
+# Only allow cachemgr access from localhost
+http_access allow localhost manager
+http_access deny manager
+
+# We strongly recommend the following be uncommented to protect innocent
+# web applications running on the proxy server who think the only
+# one who can access services on "localhost" is a local user
+#http_access deny to_localhost
+
+#
+# INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+#
+
+# Example rule allowing access from your local networks.
+# Adapt localnet in the ACL section to list your (internal) IP networks
+# from where browsing should be allowed
+http_access allow localnet
+http_access allow localhost
+
+# And finally deny all other access to this proxy
+http_access allow all
+
+# Squid normally listens to port 3128
+http_port 3128
+
+# Uncomment and adjust the following to add a disk cache directory.
+#cache_dir ufs /var/spool/squid 100 16 256
+
+# Leave coredumps in the first cache dir
+coredump_dir /var/spool/squid
+
+#
+# Add any of your own refresh_pattern entries above these.
+#
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern .		0	20%	4320
+auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd
+acl 112233 proxy_auth REQUIRED
+auth_param basic children 5
+auth_param basic realm Squid proxy-caching web server
+auth_param basic credentialsttl 2 hours
+auth_param basic casesensitive off
+EOF
+    echo "Squid配置文件已复写！"
+}
+
+# 创建用户名密码
+create_user() {
     echo "请输入用户名："
     read -r username
     echo "请输入密码："
@@ -43,93 +109,33 @@ create_password_file() {
     echo "用户名和密码已创建！"
 }
 
-# 还原默认配置文件
-restore_default_config() {
-    echo "还原默认配置文件..."
-    cp /etc/squid/squid.conf.bak /etc/squid/squid.conf
-    echo "默认配置文件已还原！"
+# 重启Squid服务
+restart_service() {
+    systemctl restart squid
+    echo "Squid服务已重启！"
 }
 
-# 启动Squid
-start_squid() {
-    echo "启动Squid..."
-    systemctl start squid
-    echo "Squid已启动！"
-}
-
-# 停止Squid
-stop_squid() {
-    echo "停止Squid..."
-    systemctl stop squid
-    echo "Squid已停止！"
-}
-
-# 卸载Squid
-uninstall_squid() {
-    echo "开始卸载Squid..."
-    systemctl stop squid
-    yum remove -y squid
-    rm -rf /etc/squid
-    echo "Squid卸载完成！"
-}
-
-# 查看访问日志
-view_access_log() {
-    echo "访问日志内容："
-    cat /var/log/squid/access.log
-}
-
-# 脚本入口
-main() {
-    echo "欢迎使用Squid一键搭建脚本！"
-    echo "请选择操作："
+# 交互菜单
+while true; do
+    echo "请选择要执行的操作："
     echo "1. 安装Squid"
-    echo "2. 配置Squid"
-    echo "3. 修改密码"
-    echo "4. 还原默认配置文件"
-    echo "5. 启动Squid"
-    echo "6. 停止Squid"
-    echo "7. 卸载Squid"
-    echo "8. 查看访问日志"
-    echo "9. 退出"
+    echo "2. 备份Squid配置文件"
+    echo "3. 复写Squid配置文件"
+    echo "4. 创建用户名密码"
+    echo "5. 重启Squid服务"
+    echo "6. 退出"
 
-    read -p "请输入操作编号：" choice
+    read -r choice
 
     case $choice in
-        1)
-            install_squid
-            ;;
-        2)
-            configure_squid
-            ;;
-        3)
-            create_password_file
-            ;;
-        4)
-            restore_default_config
-            ;;
-        5)
-            start_squid
-            ;;
-        6)
-            stop_squid
-            ;;
-        7)
-            uninstall_squid
-            ;;
-        8)
-            view_access_log
-            ;;
-        9)
-            exit 0
-            ;;
-        *)
-            echo "无效的操作编号！"
-            ;;
+        1) install_squid ;;
+        2) backup_config ;;
+        3) rewrite_config ;;
+        4) create_user ;;
+        5) restart_service ;;
+        6) break ;;
+        *) echo "无效的选项，请重新选择！" ;;
     esac
 
-    main
-}
-
-# 执行脚本
-main
+    echo
+done
