@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 脚本版本号
-script_version="1.12"
+script_version="1.13"
 # 配置多IP
 update_ipacl() {
     echo "正在获取本机所有IP"
