@@ -9,8 +9,7 @@ ip_addresses=$(ip addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
     echo "正在写入多IP规则"
 index=1
 for ip in $ip_addresses; do
-    echo "acl ip$index myip $ip" >> /etc/squid/squid.conf
-    echo "tcp_outgoing_address $ip ip$index" >> /etc/squid/squid.conf
+    echo "acl ip$index myip $ip tcp_outgoing_address $ip ip$index" >> /etc/squid/squid.conf
     index=$((index+1))
 done
 }
