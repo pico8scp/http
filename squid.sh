@@ -9,7 +9,8 @@ update_script() {
     rm -f /root/squid.sh
     wget -O /root/squid.sh https://raw.githubusercontent.com/pico8scp/http/main/squid.sh
     chmod +x /root/squid.sh
-    echo "脚本已更新，请重新启动脚本！"
+    echo "脚本已更新，正在重新启动脚本！"
+    ./squid.sh
     exit 0
 }
 
