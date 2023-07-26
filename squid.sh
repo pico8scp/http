@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 脚本版本号
-script_version="1.1"
+script_version="1.12"
 
 # 更新脚本
 update_script() {
@@ -28,6 +28,8 @@ backup_config() {
 
 # 复写Squid配置文件
 rewrite_config() {
+    rm /etc/squid/squid.conf
+    touch /etc/squid/squid.conf
     cat > /etc/squid/squid.conf << EOF
 #一、网段配置
 acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
@@ -150,6 +152,11 @@ EOF
 
 # 创建用户名密码
 create_user() {
+    if [ -f /etc/squid/passwd ]; then
+        rm /etc/squid/passwd
+        echo "旧的用户名密码文件已删除！"
+    fi
+
     echo "请输入用户名："
     read -r username
     echo "请输入密码："
