@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# 脚本版本号
+script_version="1.1"
+
+# 更新脚本
+update_script() {
+    echo "正在更新脚本..."
+    rm -f /root/squid.sh
+    wget -O /root/squid.sh https://raw.githubusercontent.com/pico8scp/http/main/squid.sh
+    chmod +x /root/squid.sh
+    echo "脚本已更新，请重新启动脚本！"
+    exit 0
+}
+
 # 安装Squid
 install_squid() {
     yum install -y squid
@@ -131,6 +144,7 @@ while true; do
     echo "5. 重启Squid服务"
     echo "6. 卸载Squid"
     echo "7. 退出"
+    echo "8. 更新脚本"
 
     read -r choice
 
@@ -142,6 +156,7 @@ while true; do
         5) restart_service ;;
         6) uninstall_squid ;;
         7) break ;;
+        8) update_script ;;
         *) echo "无效的选项，请重新选择！" ;;
     esac
 
