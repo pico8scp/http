@@ -62,10 +62,10 @@ acl Safe_ports port 777		# multiling http
 
 #三、密码策略
 # test mypass 设置squid的密码策略
-auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwords  
+auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd
 auth_param basic children 15
 auth_param basic credentialsttl 2 hours
-auth_param basic casesensitive off         #用户名不区分大小写，可改为ON区分大小写
+auth_param basic casesensitive on         #用户名不区分大小写，可改为ON区分大小写
 auth_param basic realm proxy
 
 
@@ -109,7 +109,7 @@ http_access allow localhost
 #http_access deny all
 
 
-http_port 37771                       #配置squid端口号
+http_port 10801                       #配置squid端口号
 coredump_dir /var/spool/squid
 refresh_pattern ^ftp:		1440	20%	10080
 refresh_pattern ^gopher:	1440	0%	1440
@@ -144,9 +144,6 @@ request_header_access Via deny all
 #使用透明配置时，下方2个要填入对应位置
 #acl all src 0.0.0.0/0.0.0.0                 #配置变量。允许所有ip访问， all是一个名字，可以随便起
 #http_access allow all                       #配置该变量的acl限制。允许上面定义的all这个规则访问
-————————————————
-版权声明：本文为CSDN博主「漠效」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-原文链接：https://blog.csdn.net/GX_1_11_real/article/details/111217188
 EOF
     echo "Squid配置文件已复写！"
 }
