@@ -2,17 +2,18 @@
 
 # 脚本版本号
 script_version="1.12"
-# 安装Squid
+# 配置多IP
 update_ipacl() {
     echo "正在获取本机所有IP"
-ip_addresses=$(ip addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+    ip_addresses=$(ip addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
     echo "正在写入多IP规则"
-index=1
-for ip in $ip_addresses; do
-    echo "acl ip$index myip $ip" >> /etc/squid/squid.conf
-    echo "tcp_outgoing_address $ip ip$index" >> /etc/squid/squid.conf
-    index=$((index+1))
-done
+    index=1
+    for ip in $ip_addresses; do
+        acl_name="ip_$index"
+        echo -n "acl $acl_name myip $ip" >> /etc/squid/squid.conf
+        echo " tcp_outgoing_address $ip $acl_name" >> /etc/squid/squid.conf
+        index=$((index+1))
+    done
 }
 
 # 更新脚本
