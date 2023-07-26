@@ -2,11 +2,11 @@
 
 # 脚本版本号
 script_version="1.12"
-#多IPACL规则复写
+# 安装Squid
 update_ipacl() {
-# 获取本机所有IP地址
+    echo "正在获取本机所有IP"
 ip_addresses=$(ip addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
-# 遍历IP地址列表，并将每个IP地址写入Squid配置文件中的ACL规则和出口IP地址绑定
+    echo "正在写入多IP规则"
 index=1
 for ip in $ip_addresses; do
     echo "acl ip$index myip $ip" >> /etc/squid/squid.conf
