@@ -95,8 +95,8 @@ acl authenticated proxy_auth REQUIRED
 #http_access allow MYLAN TIME        #允许客户机在工作时间访问互联网
 
 http_access deny blocked_sites       #限制变量blocked_sites的访问
-http_access deny !Safe_ports
-http_access deny CONNECT !SSL_ports
+#http_access deny !Safe_ports
+#http_access deny CONNECT !SSL_ports
 http_access allow authenticated
 http_access allow localhost manager
 http_access deny manager
