@@ -10,8 +10,8 @@ update_ipacl() {
     index=1
     for ip in $ip_addresses; do
         acl_name="ip_$index"
-        echo -n "acl $acl_name myip $ip" >> /etc/squid/squid.conf
-        echo " tcp_outgoing_address $ip $acl_name" >> /etc/squid/squid.conf
+        echo "acl $acl_name myip $ip" >> /etc/squid/squid.conf
+        echo "tcp_outgoing_address $ip $acl_name" >> /etc/squid/squid.conf
         index=$((index+1))
     done
 }
