@@ -16,20 +16,19 @@ backup_config() {
 # 复写Squid配置文件
 rewrite_config() {
     cat > /etc/squid/squid.conf << EOF
-#一、网段配置
+#
+# Recommended minimum configuration:
+#
+
+# Example rule allowing access from your local networks.
+# Adapt to list your (internal) IP networks from where browsing
+# should be allowed
 acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
 acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
 acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
 acl localnet src fc00::/7       # RFC 4193 local private network range
 acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines
-#填入可使用squid的网段
-acl local    src 192.168.10.0/24
-acl local    src 192.168.20.0/24
-acl local    src 192.168.30.0/24
 
-
-
-#二、端口配置
 acl SSL_ports port 443
 acl Safe_ports port 80		# http
 acl Safe_ports port 21		# ftp
@@ -41,93 +40,62 @@ acl Safe_ports port 280		# http-mgmt
 acl Safe_ports port 488		# gss-http
 acl Safe_ports port 591		# filemaker
 acl Safe_ports port 777		# multiling http
-
-
-
-#三、密码策略
-# test mypass 设置squid的密码策略
-auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd
-auth_param basic children 15
-auth_param basic credentialsttl 2 hours
-auth_param basic casesensitive on         #用户名不区分大小写，可改为ON区分大小写
-auth_param basic realm proxy
-
-
-
-#四、acl规则配置。先配置一个变量，在配置该变量的限制
-
-#<1>编写变量
-#mp4相关限制的变量
-#acl MYLAN src 192.168.2.0/24              #源地址网段    
-#acl MC20 maxconn 20                       #最大并发连接
-#acl DOMAIN dstdomain .qq.com .msn.com     #目标为.qq.com .msn.com的域名
-#acl FILE urlpath_regex -i \.mp3$ \.mp4$   #以.mp3 .mp4结尾的URL路径
-#acl TIME time MTWHF 07:30-17:30           #时间为周一至周五早8:30至晚17:30
-#acl vip arp 00：7c:23:76:5C:1C	           #设置某个mac地址变量为vip
-
-
-
-#设置黑名单 填入文件中的网址不可访问，一行一个网址
 acl CONNECT method CONNECT
-acl blocked_sites dstdomain "/etc/squid/blocked_sites"
-acl authenticated proxy_auth REQUIRED
 
+#
+# Recommended minimum Access Permission configuration:
+#
+# Deny requests to certain unsafe ports
+http_access deny !Safe_ports
 
-#<2>设置acl访问控制规则.
-#有先后顺序,第一条规则匹配上就不再继续往下，所以先把拒绝写在前面
-#mp4相关变量的限制
-#http_access deny MYLAN FILE         #禁止客户机下载MP3 MP4文件
-#http_access deny MYLAN DOMAIN       #禁止客户机访问acl列表中的网站
-#http_access deny MYLAN MC20         #客户机的并发连接超过20时将被阻止
-#http_access allow MYLAN TIME        #允许客户机在工作时间访问互联网
-
-#http_access deny blocked_sites       #限制变量blocked_sites的访问
-#http_access deny !Safe_ports
+# Deny CONNECT to other than secure SSL ports
 #http_access deny CONNECT !SSL_ports
-http_access allow authenticated
+
+# Only allow cachemgr access from localhost
 http_access allow localhost manager
 http_access deny manager
+
+# We strongly recommend the following be uncommented to protect innocent
+# web applications running on the proxy server who think the only
+# one who can access services on "localhost" is a local user
+#http_access deny to_localhost
+
+#
+# INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+#
+
+# Example rule allowing access from your local networks.
+# Adapt localnet in the ACL section to list your (internal) IP networks
+# from where browsing should be allowed
 http_access allow localnet
 http_access allow localhost
-#http_access allow vip                #允许变量vip访问
-#http_access deny all
 
+# And finally deny all other access to this proxy
+http_access allow fAAynkaCxxUg
 
-http_port 10801                       #配置squid端口号
+# Squid normally listens to port 3128
+http_port 80
+
+# Uncomment and adjust the following to add a disk cache directory.
+#cache_dir ufs /var/spool/squid 100 16 256
+
+# Leave coredumps in the first cache dir
 coredump_dir /var/spool/squid
+
+#
+# Add any of your own refresh_pattern entries above these.
+#
 refresh_pattern ^ftp:		1440	20%	10080
 refresh_pattern ^gopher:	1440	0%	1440
 refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
 refresh_pattern .		0	20%	4320
-
-
-
-#五、配置不同模式
-
-#高密配置，隐藏真实ip变成匿名代理 这是squid3.1
-via off
-forwarded_for delete
-request_header_access X-Forwarded-For deny all  
-request_header_access From deny all  
-request_header_access Via deny all 
-
-
-#透明配置（最方便使用，最不安全）
-#http_port 3128 transparent
-#cache_mem 99 MB
-#cache_swap_low 90
-#cache_swap_high 95
-#maximum_object_size 4M
-#minimum_object_size 0 KB
-#maximum_object_size_in_memory 4096 KB
-#memory_replacement_policy lru
-#maximum_object_size 4 MB                    #允许保存到缓存空间的最大对象大小，以KB为单位，超过大小限制的文件将不被缓存，而是直接转发给用户
-#cache_dir ufs /var/spool/squid 100 16 256 
-#access_log /var/log/squid/access.log
-
-#使用透明配置时，下方2个要填入对应位置
-#acl all src 0.0.0.0/0.0.0.0                 #配置变量。允许所有ip访问， all是一个名字，可以随便起
-#http_access allow all                       #配置该变量的acl限制。允许上面定义的all这个规则访问
+auth_param basic program /usr/lib64/squid/basic_ncsa_auth /etc/squid/passwd
+acl 112233 proxy_auth REQUIRED
+auth_param basic children 5
+auth_param basic realm Squid proxy-caching web server
+auth_param basic credentialsttl 2 hours
+auth_param basic casesensitive off
+EOF
     echo "Squid配置文件已复写！"
 }
 
