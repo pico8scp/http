@@ -191,7 +191,7 @@ uninstall_squid() {
 # 交互菜单
 while true; do
     echo "-------------------------"
-    echo "HTTP代理一键脚本（版本：1.12）"
+    echo "HTTP代理一键脚本（版本：1.13）"
     echo "请选择要执行的操作："
     echo "1. 安装Squid"
     echo "2. 备份Squid配置文件"
