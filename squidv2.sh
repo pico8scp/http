@@ -12,6 +12,7 @@ for ip in $ip_addresses; do
     echo "acl ip$index myip $ip" >> /etc/squid/squid.conf
     echo "tcp_outgoing_address $ip ip$index" >> /etc/squid/squid.conf
     index=$((index+1))
+done
 }
 
 # 更新脚本
