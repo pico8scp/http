@@ -19,8 +19,9 @@ update_ipacl() {
 # 更新脚本
 update_script() {
     echo "正在更新脚本..."
-    rm -f /root/squid.sh
-    wget -O /root/squid.sh https://raw.githubusercontent.com/pico8scp/http/main/squidv2.sh
+    rm -f /root/squidv2.sh
+    echo "旧版本已删除"
+    wget -O /root/squidv2.sh https://raw.githubusercontent.com/pico8scp/http/main/squidv2.sh
     chmod +x /root/squidv2.sh
     echo "脚本已更新，正在重新启动脚本！"
     ./squidv2.sh
