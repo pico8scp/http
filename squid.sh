@@ -120,12 +120,6 @@ refresh_pattern .		0	20%	4320
 
 #五、配置不同模式
 
-#高密配置，隐藏真实ip变成匿名代理 这是squid3.1
-via off
-forwarded_for delete
-request_header_access X-Forwarded-For deny all  
-request_header_access From deny all  
-request_header_access Via deny all 
 
 
 #透明配置（最方便使用，最不安全）
